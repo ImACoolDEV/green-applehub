@@ -10,6 +10,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Lighting = game:GetService("Lighting")
 local TweenService = game:GetService("TweenService")
 local CoreGui = game:GetService("CoreGui")
+local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
 local ParentGui = (pcall(function() return gethui() end) and gethui()) or CoreGui
@@ -247,7 +248,7 @@ local function findTheRakeModel()
 end
 
 --------------------------------------------------------------------------------
--- MAIN GUI CREATION (USING 349857348975jnegkfdng)[cite: 1]
+-- MAIN GUI CREATION[cite: 1]
 --------------------------------------------------------------------------------
 local ScreenGui = Instance.new("ScreenGui", ParentGui)
 ScreenGui.Name = "349857348975jnegkfdng"
@@ -388,6 +389,7 @@ local LuckPage      = createTab("Luck", "🍀", 4)
 local PlayerPage    = createTab("Player", "🏃", 5)
 local GamePage      = createTab("MiniGame", "🎮", 6)
 local InspectorPage = createTab("Inspector", "🔍", 7)
+local ChatPage      = createTab("GlobalChat", "🌐", 8)
 
 TabButtons["Main"].BackgroundColor3 = Color3.fromRGB(50, 180, 70)
 TabButtons["Main"].TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -440,7 +442,7 @@ local InfoLabel = Instance.new("TextLabel", InfoCard)
 InfoLabel.Size = UDim2.new(1, -20, 1, -20)
 InfoLabel.Position = UDim2.new(0, 10, 0, 10)
 InfoLabel.BackgroundTransparency = 1
-InfoLabel.Text = "🍏 GREEN APPLE HUB V5.0 — ULTIMATE EDITION\n\nOwner: Hack_aas1\nUser: " .. LocalPlayer.Name .. "\nStatus: Remote Exploits & Inspector Integrated"
+InfoLabel.Text = "🍏 GREEN APPLE HUB V5.0 — ULTIMATE EDITION\n\nOwner: Hack_aas1\nUser: " .. LocalPlayer.Name .. "\nStatus: Non-Clicking Inf Reach & Global Chat GUI"
 InfoLabel.TextColor3 = Color3.fromRGB(150, 255, 160)
 InfoLabel.Font = Enum.Font.GothamMedium
 InfoLabel.TextSize = 11
@@ -461,7 +463,7 @@ CopyDiscordBtn.Activated:Connect(function()
 end)
 
 --------------------------------------------------------------------------------
--- 2. MAIN TAB CONTENT (WITH REMOTE EXPLOITS)[cite: 1, 5]
+-- 2. MAIN TAB CONTENT[cite: 1, 5]
 --------------------------------------------------------------------------------
 local ModeFrame = Instance.new("Frame", MainPage)
 ModeFrame.Size = UDim2.new(1, 0, 0, 75)
@@ -522,7 +524,7 @@ local BringBossBtn, BringS, BringG = CreatePageBtn(MainPage, "🧲 Bring Boss: O
 local AutoFarmBtn, FarmS, FarmG = CreatePageBtn(MainPage, "👹 Auto Farm Head: OFF", 4)
 local AttackBtn, AttS, AttG = CreatePageBtn(MainPage, "⚔️ Fast Spam Clicker: OFF", 5)
 local TrigBtn, TrigS, TrigG = CreatePageBtn(MainPage, "🎯 Trigger Bot: OFF", 6)
-local InfReachBtn, ReachS, ReachG = CreatePageBtn(MainPage, "📏 INF REACH (999999999999999999 Studs): OFF", 7)
+local InfReachBtn, ReachS, ReachG = CreatePageBtn(MainPage, "📏 INF REACH (No Auto-Click): OFF", 7)
 local ShieldBtn, ShieldS, ShieldG = CreatePageBtn(MainPage, "🛡️ Infinite Shield Buff: OFF", 8)
 
 -- Broadcast Message Frame
@@ -651,9 +653,10 @@ Connections.TrigLoop = RunService.RenderStepped:Connect(function()
     end
 end)
 
+-- Inf Reach WITHOUT auto-clicking (just touch interest extension)
 safeBindClick(InfReachBtn, function()
     Features.InfReach = not Features.InfReach
-    InfReachBtn.Text = Features.InfReach and "📏 INF REACH (999999999999999999): ON" or "📏 INF REACH (999999999999999999): OFF"
+    InfReachBtn.Text = Features.InfReach and "📏 INF REACH (No Auto-Click): ON" or "📏 INF REACH (No Auto-Click): OFF"
     ReachG.Color = Features.InfReach and ON_GRAD or OFF_GRAD
 end)
 Tasks.InfReachTask = task.spawn(function()
@@ -670,7 +673,7 @@ Tasks.InfReachTask = task.spawn(function()
                             firetouchinterest(rakePart, handle, 0)
                             firetouchinterest(rakePart, handle, 1)
                         end
-                        tool:Activate()
+                        -- Removed tool:Activate() so it doesn't auto-click!
                     end
                 end
             end)
@@ -684,7 +687,7 @@ end)
 safeBindClick(ShieldBtn, function()
     Features.InfiniteShield = not Features.InfiniteShield
     ShieldBtn.Text = Features.InfiniteShield and "🛡️ Infinite Shield Buff: ON" or "🛡️ Infinite Shield Buff: OFF"
-    ShieldS.Color = Features.InfiniteShield and ON_GRAD or OFF_GRAD -- fixed local var reference
+    ShieldS.Color = Features.InfiniteShield and ON_GRAD or OFF_GRAD
 end)
 Tasks.ShieldTask = task.spawn(function()
     while true do
@@ -701,7 +704,7 @@ Tasks.ShieldTask = task.spawn(function()
 end)
 
 --------------------------------------------------------------------------------
--- 3. AUTO TAB CONTENT (WITH RECOVER ITEMS)[cite: 1, 5]
+-- 3. AUTO TAB CONTENT[cite: 1, 5]
 --------------------------------------------------------------------------------
 local AutoPickupBtn, AutoPickupS, AutoPickupG = CreatePageBtn(AutoPage, "🌀 Auto Pick-Up (Drops): OFF", 1)
 local CandyTpBtn, CandyS, CandyG = CreatePageBtn(AutoPage, "🌀 Bring Candy To Me: OFF", 2)
@@ -1216,7 +1219,7 @@ TargetBtn.Activated:Connect(function()
 end)
 
 --------------------------------------------------------------------------------
--- 7. INSPECTOR TAB CONTENT (CYCLEINDEX & FOLDER MONITOR)
+-- 7. INSPECTOR TAB CONTENT (CYCLEINDEX MONITOR)
 --------------------------------------------------------------------------------
 local InspectorCard = Instance.new("Frame", InspectorPage)
 InspectorCard.Size = UDim2.new(1, 0, 0, 200)
@@ -1284,3 +1287,119 @@ Tasks.InspectorTask = task.spawn(function()
         task.wait(1)
     end
 end)
+
+--------------------------------------------------------------------------------
+-- 8. GLOBAL CHAT TAB CONTENT (CROSS-SERVER GUI CHAT)
+--------------------------------------------------------------------------------
+local PUB_KEY = "pub-c-9a4f4955-4654-47fd-b2d9-e9ef7495b6a7" -- Public demo channel key
+local SUB_KEY = "sub-c-11111111-2222-3333-4444-555555555555"
+local CHANNEL = "greenapple_global_chat_v1"
+
+local ChatLogFrame = Instance.new("ScrollingFrame", ChatPage)
+ChatLogFrame.Size = UDim2.new(1, 0, 1, -45)
+ChatLogFrame.Position = UDim2.new(0, 0, 0, 0)
+ChatLogFrame.BackgroundColor3 = Color3.fromRGB(18, 24, 18)
+ChatLogFrame.ScrollBarThickness = 4
+ChatLogFrame.ScrollBarImageColor3 = Color3.fromRGB(80, 220, 100)
+ChatLogFrame.ZIndex = 14
+Instance.new("UICorner", ChatLogFrame).CornerRadius = UDim.new(0, 8)
+Instance.new("UIStroke", ChatLogFrame).Color = Color3.fromRGB(70, 120, 70)
+
+local ChatListLayout = Instance.new("UIListLayout", ChatLogFrame)
+ChatListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+ChatListLayout.Padding = UDim.new(0, 4)
+
+ChatListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    ChatLogFrame.CanvasSize = UDim2.new(0, 0, 0, ChatListLayout.AbsoluteContentSize.Y + 10)
+    ChatLogFrame.CanvasPosition = Vector2.new(0, ChatListLayout.AbsoluteContentSize.Y)
+end)
+
+local ChatInputBox = Instance.new("TextBox", ChatPage)
+ChatInputBox.Size = UDim2.new(0.76, 0, 0, 35)
+ChatInputBox.Position = UDim2.new(0, 0, 1, -35)
+ChatInputBox.BackgroundColor3 = Color3.fromRGB(28, 38, 28)
+ChatInputBox.PlaceholderText = "Type global cross-server message..."
+ChatInputBox.Text = ""
+ChatInputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+ChatInputBox.Font = Enum.Font.GothamMedium
+ChatInputBox.TextSize = 11
+ChatInputBox.ZIndex = 14
+Instance.new("UICorner", ChatInputBox).CornerRadius = UDim.new(0, 6)
+Instance.new("UIStroke", ChatInputBox).Color = Color3.fromRGB(70, 120, 70)
+
+local SendChatBtn = Instance.new("TextButton", ChatPage)
+SendChatBtn.Size = UDim2.new(0.22, 0, 0, 35)
+SendChatBtn.Position = UDim2.new(0.78, 0, 1, -35)
+SendChatBtn.BackgroundColor3 = Color3.fromRGB(50, 180, 70)
+SendChatBtn.Text = "💬 SEND"
+SendChatBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SendChatBtn.Font = Enum.Font.GothamBold
+SendChatBtn.TextSize = 11
+SendChatBtn.ZIndex = 14
+Instance.new("UICorner", SendChatBtn).CornerRadius = UDim.new(0, 6)
+
+local function appendChatMessage(sender, msg)
+    local msgLabel = Instance.new("TextLabel", ChatLogFrame)
+    msgLabel.Size = UDim2.new(1, -10, 0, 22)
+    msgLabel.BackgroundTransparency = 1
+    msgLabel.Text = string.format("  [<b>%s</b>]: %s", sender, msg)
+    msgLabel.TextColor3 = Color3.fromRGB(180, 255, 200)
+    msgLabel.Font = Enum.Font.Gotham
+    msgLabel.RichText = true
+    msgLabel.TextSize = 11
+    msgLabel.TextXAlignment = Enum.TextXAlignment.Left
+    msgLabel.ZIndex = 15
+end
+
+local function sendGlobalMessage(sender, message)
+    pcall(function()
+        local data = HttpService:JSONEncode({sender = sender, message = message})
+        local encodedData = HttpService:UrlEncode(data)
+        local url = string.format("https://ps.pnsb.com/publish/%s/%s/0/%s/0/%s", PUB_KEY, SUB_KEY, CHANNEL, encodedData)
+        
+        local httprequest = (syn and syn.request) or (http and http.request) or http_request or request
+        if httprequest then
+            httprequest({Url = url, Method = "GET"})
+        else
+            game:HttpGet(url)
+        end
+    end)
+end
+
+Tasks.ChatPollTask = task.spawn(function()
+    local timetoken = "0"
+    while true do
+        pcall(function()
+            local url = string.format("https://ps.pnsb.com/subscribe/%s/%s/0/%s?tt=%s", SUB_KEY, CHANNEL, "0", timetoken)
+            local response = game:HttpGet(url)
+            local decoded = HttpService:JSONDecode(response)
+            
+            if decoded and decoded.m then
+                for _, item in ipairs(decoded.m) do
+                    if item.d then
+                        local sender = item.d.sender or "Unknown"
+                        local message = item.d.message or ""
+                        appendChatMessage(sender, message)
+                    end
+                end
+                timetoken = decoded.t.t
+            end
+        end)
+        task.wait(1.5)
+    end
+end)
+
+local function handleSendChat()
+    local txt = ChatInputBox.Text:gsub("^%s*(.-)%s*$", "%1")
+    if txt ~= "" then
+        sendGlobalMessage(LocalPlayer.Name, txt)
+        ChatInputBox.Text = ""
+    end
+end
+
+SendChatBtn.Activated:Connect(handleSendChat)
+ChatInputBox.FocusLost:Connect(function(enterPressed)
+    if enterPressed then handleSendChat() end
+end)
+
+appendChatMessage("System", "Connected to Green Apple Hub Global Cross-Server Chat GUI!")
